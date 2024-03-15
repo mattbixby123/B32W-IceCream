@@ -11,7 +11,6 @@ app.use(express.json());
 // Log the requests as they come in
 app.use(require('morgan')('dev'));
 
-
 // Read Flavors - READ / GET
 app.get('/api/flavors', async (req, res, next) => {
   try {
@@ -38,54 +37,55 @@ app.get('/api/flavors/:id', async (req, res, next) => {
   } catch (error) {
     next(error)
   }
-})  
+});
 
-// Create Notes - CREATE / POST
-// app.post('/api/notes', async (req, res, next) => {
-//   try {
-//     const SQL = /*sql*/
-//     `
-//     INSERT INTO notes(txt)
-//     VALUES($1)
-//     RETURNING *
-//     `;
-//     const response = await client.query(SQL, [req.body.txt]);
-//     res.send(response.rows[0]);
-//   } catch (ex) {
-//     next(ex);
-//   }
-// });
+// POST/CREATE Flavor - payload: the flavor to create, returns the created flavor
+app.post('/api/flavors', async (req, res, next) => {
+  try {
+    const SQL = /*sql*/
+    `
+    INSERT INTO flavors(name)
+    VALUES($1)
+    RETURNING *
+    `;
+    const response = await client.query(SQL, [req.body.name]);
+    res.send(response.rows[0]);
+  } catch (error) {
+    next(error)
+  }
+});
 
-// Updates Notes - UPDATE / PUT
-// app.put('/api/notes/:id', async (req, res, next) => {
-//   try {
-//     const SQL = /*sql*/
-//     `
-//     UPDATE notes 
-//     SET txt=$1, ranking=$2, updated_at= now()
-//     WHERE id=$3 RETURNING *
-//     `;
-//     const response = await client.query(SQL, [req.body.txt, req.body.ranking, req.params.id]);
-//     res.send(response.rows[0]);
-//   } catch (ex) {
-//     next(ex);
-//   }
-// });
+// UPDATE Flavor / PUT  - payload: the updated flavor, returns the updated flavor
+app.put('/api/flavors/:id', async (req, res, next) => {
+  try {
+    const SQL = /*sql*/
+    `
+    UPDATE flavors
+    SET name=$1, is_favorite=$2, updated_at= now()
+    WHERE id=$3 RETURNING *
+    `;
+    const response = await client.query(SQL, [req.body.name, req.body.isFavorite, req.params.id]);
+    res.send(response.rows[0]);
+  } catch (error) {
+    next(error)
+  }
+});
 
-// Delete Notes - DELETE / DELETE
-// app.delete('/api/notes/:id', async (req, res, next) => {
-//   try {
-//     const SQL = /*sql*/
-//     `
-//     DELETE from notes
-//     WHERE id = $1
-//     `;
-//     const response = await client.query(SQL, [req.params.id]);
-//     res.sendStatus(204);
-//   } catch (ex) {
-//     next(ex);
-//   }
-// });
+
+// DELETE/DELETE - Deletes flavor and returns nothing
+app.delete('/api/flavors/:id', async (req, res, next) => {
+  try {
+    const SQL = /*sql*/
+    `
+    DELETE from flavors
+    WHERE id = $1
+    `;
+    const response = await client.query(SQL, [req.params.id]);
+    res.sendStatus(204);
+  } catch (error) {
+    next(error)
+  }
+});
 
 // create your init function (create and run the express app)
 const init =  async () => {
@@ -99,7 +99,7 @@ const init =  async () => {
     name CHAR(55) NOT NULL,
     is_favorite BOOLEAN DEFAULT FALSE, 
     created_at TIMESTAMP DEFAULT now(),
-    updated_at TIMESTAMP DEFAULT now(),
+    updated_at TIMESTAMP DEFAULT now()
     );
     `;
   await client.query(SQL);
