@@ -87,6 +87,7 @@ app.delete('/api/flavors/:id', async (req, res, next) => {
   }
 });
 
+
 // create your init function (create and run the express app)
 const init =  async () => {
   await client.connect();
